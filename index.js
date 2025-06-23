@@ -17,7 +17,7 @@ app.use(favicon(path.join(import.meta.dirname, 'favicon.ico')))
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 15,
-  message: 'Terlalu banyak request, coba lagi dalam 15 menit'
+  message: 'Too many requests, please try again in 15 minutes'
 })
 
 const speedLimiter = slowDown({
@@ -51,7 +51,7 @@ const htmlTemplate = (type, subject, message, to) => {
     <p style="font-size: 14px; color: #888;">Dikirim oleh <b><a href="https://saweria.co/nekochii" style="text-decoration: none; color: #f78fb3">@nekochii</a></b></p>`
 
   switch (type) {
-    case 'pengumuman':
+    case 'announcement':
       return `
         <div style="font-family: Arial, sans-serif; padding: 20px; background: #fffbea; border: 1px solid #f1c40f; border-radius: 8px;">
           <img src="https://raw.githubusercontent.com/senochii/DB/main/storage/d4cefbb9.jpeg" width="100" alt="announcement">
@@ -60,7 +60,7 @@ const htmlTemplate = (type, subject, message, to) => {
           ${footer}
         </div>
       `
-    case 'registrasi':
+    case 'registration':
       return `
         <div style="font-family: Arial, sans-serif; padding: 20px; background: #f0f9ff; border: 1px solid #3498db; border-radius: 8px;">
           <h2 style="color: #2980b9;">${subject}</h2>
@@ -102,12 +102,12 @@ app.post('/send-email', limiter, speedLimiter, validateEmail, async (req, res) =
     const { to, subject, message, template = 'default' } = req.body
 
     const requestKey = `${to}-${subject}-${message.substring(0, 50)}`
-    if (requestCache.has(requestKey)) return res.status(429).json({ message: 'Email serupa baru saja dikirim. Tunggu sebentar ya~' })
+    if (requestCache.has(requestKey)) return res.status(429).json({ message: 'A similar email has just been sent. Please wait a moment.~' })
     requestCache.set(requestKey, Date.now())
 
     const blockedDomains = ['example.com', 'test.com']
     const recipientDomain = to.split('@')[1]
-    if (blockedDomains.includes(recipientDomain)) return res.status(400).json({ message: 'Domain email ini tidak diizinkan' })
+    if (blockedDomains.includes(recipientDomain)) return res.status(400).json({ message: 'This email domain is not allowed' })
 
     const mailOptions = {
       from: `\"NekoMail\" <${process.env.EMAIL_USER}>`,
@@ -121,21 +121,21 @@ app.post('/send-email', limiter, speedLimiter, validateEmail, async (req, res) =
     const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 10000))
     await Promise.race([sendMailPromise, timeoutPromise])
 
-    res.json({ message: 'Meow~ Email berhasil dikirim!' })
+    res.json({ message: 'Meow~ Email sent successfully!' })
   } catch (error) {
     console.error('Email error:', error.message)
     if (error.message.includes('timeout')) {
-      res.status(504).json({ message: 'Meong~ Email terlalu lama dikirim :<' })
+      res.status(504).json({ message: 'Meow~ Email took too long to send :<' })
     } else if (error.code === 'ECONNECTION') {
-      res.status(503).json({ message: 'Layanan email sedang tidak tersedia' })
+      res.status(503).json({ message: 'Email service is currently unavailable' })
     } else {
-      res.status(500).json({ message: 'Gagal mengirim email :(' })
+      res.status(500).json({ message: 'Failed to send email :(' })
     }
   }
 })
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`📮 NekoMail aktif di port ${PORT}`))
+app.listen(PORT, () => console.log(`📮 NekoMail is active on port ${PORT}`))
 
 setInterval(() => {
   const now = Date.now()
