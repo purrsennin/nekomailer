@@ -8,7 +8,7 @@
     "cors": "*",
     "helmet": "*",
     "express-validator": "*",
-    "express-slow-down": "*"
+    "express-slow-down": "*",
     "serve-favicon": "*"
   }
 }
