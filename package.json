@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "dependencies": {
+    "express": "*",
+    "nodemailer": "*",
+    "express-rate-limit": "*",
+    "dotenv": "*",
+    "cors": "*",
+    "helmet": "*",
+    "express-validator": "*",
+    "express-slow-down": "*"
+    "serve-favicon": "*"
+  }
+}
