@@ -75,7 +75,7 @@ const htmlTemplate = (style, subject, message, to) => {
       <h2 style="color: #4caf50;">${subject}</h2>
       <pre style="white-space: pre-wrap; line-height: 1.5; color: #ccc;">${message}</pre>
       <hr style="border-color: #333;">
-      <p style="font-size: 12px; color: #666;">Powered by <b><a href="https://lemon-email.vercel.app" style="text-decoration: none; color: #666;">Lemon Email Sender</a></b></p>
+      <p style="font-size: 12px; color: #666;">Powered by <b><a href="https://nekochii-mailer.hf.space" style="text-decoration: none; color: #666;">Nekomailer API</a></b></p>
     </div>`,
 
     struck: `<div style="padding:20px;border:1px dashed #222;font-size:15px">
@@ -84,7 +84,7 @@ const htmlTemplate = (style, subject, message, to) => {
       <p>${message}</p>
       <br>
       <hr style="border:0px; border-top:1px dashed #222">
-      <p>Send with <b><a href="https://lemon-email.vercel.app" style="text-decoration: none;">Lemon Email Sender</a></b></p>
+      <p>Send with <b><a href="https://nekochii-mailer.hf.space" style="text-decoration: none;">Nekomailer API</a></b></p>
       </tt>
     </div>`,
 
@@ -92,7 +92,7 @@ const htmlTemplate = (style, subject, message, to) => {
       <h2 style="color:#007BFF;">🔔 ${subject}</h2>
       <p style="font-size:16px;color:#333;">${message}</p>
       <div style="margin-top:20px;font-size:13px;color:#888;">
-        Sent using <a href="https://lemon-email.vercel.app" style="color:#007BFF;text-decoration:none;">Lemon Email Sender</a>
+        Sent using <a href="https://nekochii-mailer.hf.space" style="color:#007BFF;text-decoration:none;">Nekomailer API</a>
       </div>
     </div>`,
 
@@ -100,7 +100,7 @@ const htmlTemplate = (style, subject, message, to) => {
       <h2 style="color:#d63031;margin-top:0;">${subject}</h2>
       <p style="font-size:15px;color:#2d3436;">${message}</p>
       <p style="margin-top:20px;font-size:13px;color:#6c5ce7;">
-        Sent via <a href="https://lemon-email.vercel.app" style="color:#00b894;text-decoration:none;"><b>Lemon Email Sender</b></a>
+        Sent via <a href="https://nekochii-mailer.hf.space" style="color:#00b894;text-decoration:none;"><b>Nekomailer API</b></a>
       </p>
     </div>`,
 
@@ -111,7 +111,7 @@ const htmlTemplate = (style, subject, message, to) => {
             <h2 style="color:#34495e;">${subject}</h2>
             <p style="font-size:16px;color:#2c3e50;line-height:1.6;">${message}</p>
             <hr style="margin:20px 0;border:none;border-top:1px solid #eee;">
-            <p style="font-size:13px;color:#999;text-align:right;">Sent with <a href="https://lemon-email.vercel.app" style="color:#3498db;text-decoration:none;">Lemon Email Sender</a></p>
+            <p style="font-size:13px;color:#999;text-align:right;">Sent with <a href="https://nekochii-mailer.hf.space" style="color:#3498db;text-decoration:none;">Nekomailer API</a></p>
           </td>
         </tr>
       </table>
@@ -120,14 +120,14 @@ const htmlTemplate = (style, subject, message, to) => {
     artsyBorder: `<div style="padding:20px;border:4px double #6c5ce7;background:#fdf0ff;border-radius:10px;font-family:'Trebuchet MS',sans-serif;">
       <h2 style="color:#6c5ce7;">${subject}</h2>
       <p style="color:#2d3436;font-size:16px;line-height:1.6;">${message}</p>
-      <p style="font-size:12px;color:#a29bfe;margin-top:20px;">Generated with 💛 by <a href="https://lemon-email.vercel.app" style="color:#6c5ce7;text-decoration:underline;">Lemon Email Sender</a></p>
+      <p style="font-size:12px;color:#a29bfe;margin-top:20px;">Generated with 💛 by <a href="https://nekochii-mailer.hf.space" style="color:#6c5ce7;text-decoration:underline;">Nekomailer API</a></p>
     </div>`,
 
     receiptStyle: `<div style="font-family:'Courier New',monospace;background:#fff;padding:20px;border:1px dashed #333;max-width:500px;margin:auto;">
       <h2 style="border-bottom:1px dashed #000;padding-bottom:5px;">🧾 ${subject}</h2>
       <pre style="white-space:pre-wrap;font-size:14px;line-height:1.6;">${message}</pre>
       <hr style="border:none;border-top:1px dashed #000;margin:20px 0;">
-      <p style="font-size:12px;text-align:center;color:#555;">Printed by <a href="https://lemon-email.vercel.app" style="color:#222;text-decoration:none;">Lemon Email Sender</a></p>
+      <p style="font-size:12px;text-align:center;color:#555;">Printed by <a href="https://nekochii-mailer.hf.space" style="color:#222;text-decoration:none;">Nekomailer API</a></p>
     </div>`,
 
     magazineClassic: `<div style="background:#ffffff;max-width:600px;margin:20px auto;font-family:Georgia,serif;border-radius:8px;overflow:hidden;border:1px solid #e0e0e0;">
@@ -135,7 +135,7 @@ const htmlTemplate = (style, subject, message, to) => {
         <h2 style="margin-top:0;color:#333;font-family:'Times New Roman',serif;">${subject}</h2>
         <p style="font-size:16px;line-height:1.6;color:#555;">${message}</p>
         <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
-        <p style="font-size:13px;color:#999;text-align:right;">Powered by <a href="https://lemon-email.vercel.app" style="color:#999;text-decoration:none;">Lemon Email Sender</a></p>
+        <p style="font-size:13px;color:#999;text-align:right;">Powered by <a href="https://nekochii-mailer.hf.space" style="color:#999;text-decoration:none;">Nekomailer API</a></p>
       </div>
     </div>`,
 
@@ -145,7 +145,7 @@ const htmlTemplate = (style, subject, message, to) => {
         <p style="margin:20px 0;font-size:16px;color:#555;line-height:1.6;">${message}</p>
       </div>
       <div style="padding:15px 30px;background:#f0f0f0;border-bottom-left-radius:10px;border-bottom-right-radius:10px;">
-        <p style="font-size:12px;color:#888;margin:0;">Exclusive email via <a href="https://lemon-email.vercel.app" style="color:#888;text-decoration:underline;">Lemon Email Sender</a></p>
+        <p style="font-size:12px;color:#888;margin:0;">Exclusive email via <a href="https://nekochii-mailer.hf.space" style="color:#888;text-decoration:underline;">Nekomailer API</a></p>
       </div>
     </div>`,
 
@@ -153,7 +153,7 @@ const htmlTemplate = (style, subject, message, to) => {
       <h2 style="font-weight:normal;color:#222;margin-top:0;">${subject}</h2>
       <p style="color:#444;font-size:15px;line-height:1.7;">${message}</p>
       <div style="margin-top:30px;font-size:12px;color:#aaa;text-align:center;">
-        Sent using <a href="https://lemon-email.vercel.app" style="color:#aaa;text-decoration:none;">Lemon Email Sender</a>
+        Sent using <a href="https://nekochii-mailer.hf.space" style="color:#aaa;text-decoration:none;">Nekomailer API</a>
       </div>
     </div>`
   }
