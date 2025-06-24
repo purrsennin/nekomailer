@@ -34,7 +34,7 @@ Configuration reference: [Hugging Face Docs](https://huggingface.co/docs/hub/spa
 
 ### Endpoint:
 ```
-POST /send-email
+POST /neko-post
 ```
 
 ### Headers:
@@ -56,7 +56,7 @@ Content-Type: application/json
 ## 💻 Example Request
 
 ```bash
-curl -X POST https://nekomail.hf.space/send-email \
+curl -X POST https://nekomail.hf.space/neko-post \
   -H "Content-Type: application/json" \
   -d '{
     "to": "example@gmail.com",
