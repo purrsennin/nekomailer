@@ -69,7 +69,8 @@ const htmlTemplate = (style, subject, message, to) => {
       <hr style="border:0px; border-top:1px dashed #222">
       <p>Send with <b><a href="https://nekochii-mailer.hf.space" style="text-decoration: none;">Nekomailer API</a></b></p>
       </tt>
-    </div>`
+    </div>`,
+    
     dark: `<div style="background: #1e1e1e; color: #f0f0f0; padding: 20px; border-radius: 8px; font-family: monospace;">
       <h2 style="color: #4caf50;">${subject}</h2>
       <pre style="white-space: pre-wrap; line-height: 1.5; color: #ccc;">${message}</pre>
