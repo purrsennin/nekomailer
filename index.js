@@ -9,13 +9,18 @@ import { body, validationResult } from 'express-validator'
 import slowDown from 'express-slow-down'
 import favicon from 'serve-favicon'
 import dotenv from 'dotenv'
+import { fileURLToPath } from 'url'
+
 dotenv.config()
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 const app = express()
 
+// Middleware
 app.use(helmet())
 app.use(express.json({ limit: '10kb' }))
-app.use(favicon(path.join(import.meta.dirname, 'favicon.ico')))
+app.use(favicon(path.join(__dirname, 'favicon.ico')))
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -38,6 +43,7 @@ const validateEmail = [
 const requestCache = new Map()
 const CACHE_TTL = 5 * 60 * 1000
 
+// Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   pool: true,
@@ -49,71 +55,144 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-const htmlTemplate = (type, subject, message, to) => {
-  const footer = `<hr style="margin: 20px 0;">
-    <p style="font-size: 14px; color: #888;">Dikirim oleh <b><a href="https://saweria.co/nekochii" style="text-decoration: none; color: #f78fb3">@nekochii</a></b></p>`
+// Email template function
+const htmlTemplate = (style, subject, message, to) => {
+  const templates = {
+    default: `<div style="font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
+      <h2 style="color: #2c3e50;">${subject}</h2>
+      <p style="color: #333; font-size: 16px; line-height: 1.5;">${message}</p>
+      <hr style="margin: 20px 0;">
+      <p style="font-size: 14px; color: #999;">This message was sent via <b><a href="https://nekochii-mailer.hf.space" style="text-decoration: none; color: green;">Nekomailer API</a></b></p>
+    </div>`,
+    struck: `<div style="padding:20px;border:1px dashed #222;font-size:15px">
+      <tt>Hi <b>${to}</b><br><br><p>${message}</p><br>
+      <hr style="border:0px; border-top:1px dashed #222">
+      <p>Send with <b><a href="https://nekochii-mailer.hf.space" style="text-decoration: none;">Nekomailer API</a></b></p>
+      </tt>
+    </div>`
+    dark: `<div style="background: #1e1e1e; color: #f0f0f0; padding: 20px; border-radius: 8px; font-family: monospace;">
+      <h2 style="color: #4caf50;">${subject}</h2>
+      <pre style="white-space: pre-wrap; line-height: 1.5; color: #ccc;">${message}</pre>
+      <hr style="border-color: #333;">
+      <p style="font-size: 12px; color: #666;">Powered by <b><a href="https://lemon-email.vercel.app" style="text-decoration: none; color: #666;">Lemon Email Sender</a></b></p>
+    </div>`,
 
-  switch (type) {
-    case 'announcement':
-      return `
-        <div style="font-family: Arial, sans-serif; padding: 20px; background: #fffbea; border: 1px solid #f1c40f; border-radius: 8px;">
-          <img src="https://raw.githubusercontent.com/senochii/DB/main/storage/d4cefbb9.jpeg" width="100" alt="announcement">
-          <h2 style="color: #d35400;">${subject}</h2>
-          <p style="color: #333; font-size: 15px; line-height: 1.6;">${message}</p>
-          ${footer}
-        </div>
-      `
-    case 'registration':
-      return `
-        <div style="font-family: Arial, sans-serif; padding: 20px; background: #f0f9ff; border: 1px solid #3498db; border-radius: 8px;">
-          <h2 style="color: #2980b9;">${subject}</h2>
-          <p style="color: #333; font-size: 15px; line-height: 1.6;">
-            ${message}
-          </p>
-          <p style="font-size: 14px; color: #555;">Email terdaftar: <b>${to}</b></p>
-          ${footer}
-        </div>
-      `
-    default:
-      return `
-        <div style="font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
-          <h2 style="color: #2c3e50;">${subject}</h2>
-          <p style="color: #333; font-size: 16px; line-height: 1.5;">${message}</p>
-          ${footer}
-        </div>
-      `
+    struck: `<div style="padding:20px;border:1px dashed #222;font-size:15px">
+      <tt>Hi <b>${to}</b>
+      <br><br>
+      <p>${message}</p>
+      <br>
+      <hr style="border:0px; border-top:1px dashed #222">
+      <p>Send with <b><a href="https://lemon-email.vercel.app" style="text-decoration: none;">Lemon Email Sender</a></b></p>
+      </tt>
+    </div>`,
+
+    notificationBox: `<div style="max-width:600px;margin:auto;padding:20px;background:#fff;border-left:6px solid #007BFF;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);font-family:'Segoe UI',sans-serif;">
+      <h2 style="color:#007BFF;">🔔 ${subject}</h2>
+      <p style="font-size:16px;color:#333;">${message}</p>
+      <div style="margin-top:20px;font-size:13px;color:#888;">
+        Sent using <a href="https://lemon-email.vercel.app" style="color:#007BFF;text-decoration:none;">Lemon Email Sender</a>
+      </div>
+    </div>`,
+
+    juiceBox: `<div style="background:#ffeaa7;padding:25px;border-radius:12px;border:2px dashed #fdcb6e;font-family:'Comic Sans MS',cursive;">
+      <h2 style="color:#d63031;margin-top:0;">${subject}</h2>
+      <p style="font-size:15px;color:#2d3436;">${message}</p>
+      <p style="margin-top:20px;font-size:13px;color:#6c5ce7;">
+        Sent via <a href="https://lemon-email.vercel.app" style="color:#00b894;text-decoration:none;"><b>Lemon Email Sender</b></a>
+      </p>
+    </div>`,
+
+    corporateClean: `<div style="background:#f4f6f8;padding:30px;border-radius:6px;font-family:'Arial',sans-serif;">
+      <table style="width:100%;max-width:600px;margin:auto;background:#fff;border:1px solid #ddd;border-radius:8px;padding:20px;">
+        <tr>
+          <td>
+            <h2 style="color:#34495e;">${subject}</h2>
+            <p style="font-size:16px;color:#2c3e50;line-height:1.6;">${message}</p>
+            <hr style="margin:20px 0;border:none;border-top:1px solid #eee;">
+            <p style="font-size:13px;color:#999;text-align:right;">Sent with <a href="https://lemon-email.vercel.app" style="color:#3498db;text-decoration:none;">Lemon Email Sender</a></p>
+          </td>
+        </tr>
+      </table>
+    </div>`,
+
+    artsyBorder: `<div style="padding:20px;border:4px double #6c5ce7;background:#fdf0ff;border-radius:10px;font-family:'Trebuchet MS',sans-serif;">
+      <h2 style="color:#6c5ce7;">${subject}</h2>
+      <p style="color:#2d3436;font-size:16px;line-height:1.6;">${message}</p>
+      <p style="font-size:12px;color:#a29bfe;margin-top:20px;">Generated with 💛 by <a href="https://lemon-email.vercel.app" style="color:#6c5ce7;text-decoration:underline;">Lemon Email Sender</a></p>
+    </div>`,
+
+    receiptStyle: `<div style="font-family:'Courier New',monospace;background:#fff;padding:20px;border:1px dashed #333;max-width:500px;margin:auto;">
+      <h2 style="border-bottom:1px dashed #000;padding-bottom:5px;">🧾 ${subject}</h2>
+      <pre style="white-space:pre-wrap;font-size:14px;line-height:1.6;">${message}</pre>
+      <hr style="border:none;border-top:1px dashed #000;margin:20px 0;">
+      <p style="font-size:12px;text-align:center;color:#555;">Printed by <a href="https://lemon-email.vercel.app" style="color:#222;text-decoration:none;">Lemon Email Sender</a></p>
+    </div>`,
+
+    magazineClassic: `<div style="background:#ffffff;max-width:600px;margin:20px auto;font-family:Georgia,serif;border-radius:8px;overflow:hidden;border:1px solid #e0e0e0;">
+      <div style="padding:20px;">
+        <h2 style="margin-top:0;color:#333;font-family:'Times New Roman',serif;">${subject}</h2>
+        <p style="font-size:16px;line-height:1.6;color:#555;">${message}</p>
+        <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+        <p style="font-size:13px;color:#999;text-align:right;">Powered by <a href="https://lemon-email.vercel.app" style="color:#999;text-decoration:none;">Lemon Email Sender</a></p>
+      </div>
+    </div>`,
+
+    luxuryPromo: `<div style="background:#fafafa;max-width:600px;margin:20px auto;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-family:'Helvetica Neue',sans-serif;">
+      <div style="padding:30px;text-align:center;">
+        <h2 style="margin:0;color:#222;font-size:24px;">${subject}</h2>
+        <p style="margin:20px 0;font-size:16px;color:#555;line-height:1.6;">${message}</p>
+      </div>
+      <div style="padding:15px 30px;background:#f0f0f0;border-bottom-left-radius:10px;border-bottom-right-radius:10px;">
+        <p style="font-size:12px;color:#888;margin:0;">Exclusive email via <a href="https://lemon-email.vercel.app" style="color:#888;text-decoration:underline;">Lemon Email Sender</a></p>
+      </div>
+    </div>`,
+
+    minimalMono: `<div style="max-width:550px;margin:30px auto;padding:25px;font-family:'Arial',sans-serif;border:1px solid #ddd;border-radius:6px;background:#fff;">
+      <h2 style="font-weight:normal;color:#222;margin-top:0;">${subject}</h2>
+      <p style="color:#444;font-size:15px;line-height:1.7;">${message}</p>
+      <div style="margin-top:30px;font-size:12px;color:#aaa;text-align:center;">
+        Sent using <a href="https://lemon-email.vercel.app" style="color:#aaa;text-decoration:none;">Lemon Email Sender</a>
+      </div>
+    </div>`
   }
+  return templates[style] || templates.default
 }
 
+// Routes
 app.get('/', (req, res) => {
   res.json({
     message: 'Nekomailer API',
     endpoint: {
       method: 'POST',
-      path: '/send-email',
-      description: 'nekomailer is an api that helps send a message to someone quickly, accurately and verified.',
-      note: 'nekomailer is under senochii surveillance'
+      path: '/neko-post',
+      description: 'Nekomailer is an API that helps send a message to someone quickly, accurately and verified.',
+      note: 'Nekomailer is under senochii surveillance'
     }
   })
 })
 
-app.post('/send-email', limiter, speedLimiter, validateEmail, async (req, res) => {
+app.post('/neko-post', limiter, speedLimiter, validateEmail, async (req, res) => {
   try {
     const errors = validationResult(req)
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() })
 
     const { to, subject, message, template = 'default' } = req.body
-
     const requestKey = `${to}-${subject}-${message.substring(0, 50)}`
-    if (requestCache.has(requestKey)) return res.status(429).json({ message: 'A similar email has just been sent. Please wait a moment.~' })
+
+    if (requestCache.has(requestKey)) {
+      return res.status(429).json({ message: 'A similar email has just been sent. Please wait a moment.~' })
+    }
     requestCache.set(requestKey, Date.now())
 
     const blockedDomains = ['example.com', 'test.com']
     const recipientDomain = to.split('@')[1]
-    if (blockedDomains.includes(recipientDomain)) return res.status(400).json({ message: 'This email domain is not allowed' })
+    if (blockedDomains.includes(recipientDomain)) {
+      return res.status(400).json({ message: 'This email domain is not allowed' })
+    }
 
     const mailOptions = {
-      from: `\"NekoMail\" <${process.env.EMAIL_USER}>`,
+      from: `"NekoMail" <${process.env.EMAIL_USER}>`,
       to,
       subject: `[NekoMail] ${subject}`,
       html: htmlTemplate(template, subject, message, to),
@@ -137,12 +216,15 @@ app.post('/send-email', limiter, speedLimiter, validateEmail, async (req, res) =
   }
 })
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`📮 NekoMail is active on port ${PORT}`))
-
+// Auto-clear cache
 setInterval(() => {
   const now = Date.now()
-  requestCache.forEach((timestamp, key) => {
+  for (const [key, timestamp] of requestCache) {
     if (now - timestamp > CACHE_TTL) requestCache.delete(key)
-  })
+  }
 }, CACHE_TTL)
+
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`📮 NekoMail is active on port ${PORT}`)
+})
